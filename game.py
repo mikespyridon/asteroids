@@ -7,8 +7,10 @@ class Game:
     ship_sprite = Ship(assets['ship'], (WIDTH / 2, 535), screen)
     self.ship = pygame.sprite.GroupSingle(ship_sprite)
     
-  def run(self):
+  def run(self): 
     self.ship.update()
+    
+    self.ship.sprite.lasers.draw(screen)
     self.ship.draw(screen)
     
 if __name__ == '__main__':
@@ -26,8 +28,6 @@ if __name__ == '__main__':
   assets = {
       'ship': load_image('ship.png'),
       'asteroid': load_image('asteroid.png'),
-      'laser': pygame.Surface((20, 20)),
-      'rock': 'rock',
     }
   
   game = Game()

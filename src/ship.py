@@ -1,5 +1,6 @@
 import pygame
 from pygame.math import Vector2
+from src.laser import Laser
 
 class Ship(pygame.sprite.Sprite):
   def __init__(self, image, pos, screen):
@@ -9,10 +10,16 @@ class Ship(pygame.sprite.Sprite):
     self.image = image
     self.rect = self.image.get_rect(center= pos)
     
+    #laser properties
+    self.ready_to_shoot = True
+    self.laser_time = 0
+    self.laser_cooldown = 600
+    
+    self.lasers = pygame.sprite.Group()
+    
     #physics
     self.direction = pygame.math.Vector2(0,0)
     self.speed = 2
-    self.gravity = -0.8
     
   def get_input(self):
     keys = pygame.key.get_pressed()
@@ -32,13 +39,33 @@ class Ship(pygame.sprite.Sprite):
     else:
       self.direction.y = 0
     
+    if keys[pygame.K_SPACE] and self.ready_to_shoot:
+      self.shoot_laser()
+      self.ready_to_shoot = False
+      self.laser_time = pygame.time.get_ticks()
+    
     #normalize vector
     if self.direction.x != 0 or self.direction.y != 0:
       self.direction.scale_to_length(4)
       self.rect.x += self.direction.x * self.speed
       self.rect.y += self.direction.y * self.speed
       
-  def collision(self):
+  def recharge(self):
+    if not self.ready_to_shoot:
+      current_time = pygame.time.get_ticks()
+      if current_time - self.laser_time >= self.laser_cooldown:
+        self.ready_to_shoot = True
+        
+  def shoot_laser(self):
+    self.lasers.add(Laser(pygame.Surface((3, 40)), self.rect.center))
+    
+  def laser_movement(self):
+    for laser in self.lasers:
+      laser.rect.y -= 5
+      if laser.rect.bottom <= 0:
+        laser.kill()
+    
+  def screen_constraint(self):
     # collision with screen
     if self.rect.left <= 0:
       self.rect.left = 0
@@ -51,6 +78,8 @@ class Ship(pygame.sprite.Sprite):
   
   def update(self):
     self.get_input()
-    self.collision()
+    self.screen_constraint()
+    self.recharge()
+    self.laser_movement()
       
   
