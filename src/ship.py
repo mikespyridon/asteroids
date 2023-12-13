@@ -66,14 +66,16 @@ class Ship(pygame.sprite.Sprite):
         laser.kill()
     
   def screen_constraint(self):
-    # collision with screen
+    #horizontal screen collison
     if self.rect.left <= 0:
       self.rect.left = 0
-    elif self.rect.right >= self.screen.get_width():
+    elif self.rect.right >= 800:
       self.rect.right = 800
-    elif self.rect.top <= 0:
+     
+     #vertical screen collision 
+    if self.rect.top <= 0:
       self.rect.top = 0
-    elif self.rect.bottom >= self.screen.get_height():
+    elif self.rect.bottom >= 600:
       self.rect.bottom = 600
   
   def update(self):
