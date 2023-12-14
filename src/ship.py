@@ -1,5 +1,4 @@
 import pygame
-from pygame.math import Vector2
 from src.laser import Laser
 
 class Ship(pygame.sprite.Sprite):
@@ -13,13 +12,15 @@ class Ship(pygame.sprite.Sprite):
     #laser properties
     self.ready_to_shoot = True
     self.laser_time = 0
-    self.laser_cooldown = 600
+    self.laser_cooldown = 100
     
     self.lasers = pygame.sprite.Group()
     
     #physics
     self.direction = pygame.math.Vector2(0,0)
     self.speed = 2
+    
+    self.health = 3
     
   def get_input(self):
     keys = pygame.key.get_pressed()
@@ -59,12 +60,6 @@ class Ship(pygame.sprite.Sprite):
   def shoot_laser(self):
     self.lasers.add(Laser(pygame.Surface((3, 40)), self.rect.center))
     
-  def laser_movement(self):
-    for laser in self.lasers:
-      laser.rect.y -= 5
-      if laser.rect.bottom <= 0:
-        laser.kill()
-    
   def screen_constraint(self):
     #horizontal screen collison
     if self.rect.left <= 0:
@@ -73,15 +68,21 @@ class Ship(pygame.sprite.Sprite):
       self.rect.right = 800
      
      #vertical screen collision 
-    if self.rect.top <= 0:
-      self.rect.top = 0
+    if self.rect.top <= 400:
+      self.rect.top = 400
     elif self.rect.bottom >= 600:
       self.rect.bottom = 600
+  
+  def get_hit(self):
+    
+    if self.health <= 0:
+      self.kill()
+    else: 
+      self.health -= 1
   
   def update(self):
     self.get_input()
     self.screen_constraint()
     self.recharge()
-    self.laser_movement()
+    self.lasers.update()
       
-  
